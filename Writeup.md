@@ -15,7 +15,7 @@ I did download and use the QuadSim to generate and record new training data, how
 
 In this part I many issues during the install. I did clone the reposity [RoboND-Python-Starterkit](https://github.com/udacity/RoboND-Python-StarterKit), however, when I follow the instructions and create the RoboND environment I get a "parse error". This seem to be rather a new issue since no has reported it yet to the issues tracker. I did face this issue when running within a windows 10 VM and also within a completely new Windows 10 installation. I report the issue to the  https://github.com/udacity/RoboND-Python-StarterKit/issues/5.
 
-I had two successful workarounds, one is to copy the environment from an older working installation. The other one (after many trials and error) is to run "conda env list" 
+I had two successful workarounds, one is to copy the environment from an older working installation. The other one (after many trials and error) is detailed in my comment in the same issues thread: https://github.com/udacity/RoboND-Python-StarterKit/issues/5#issuecomment-425746056
 
 ## Implementing the Segmentation Network
 
@@ -78,11 +78,11 @@ def fcn_model(inputs, num_classes):
 
 These results are based on runnin the model on my local PC using merely the CPU which has 8 logical processors.
 
-### Training my Model ###
+### Training my Model (CPU) ###
 
 Initially I started with a smaller network structure and only 5 epochs to verify my code then I double the number of filters for each layers and doubled the number of epochs. Current parameters are listed as follows:
 
-# Used Parameters:
+**Used Parameters**
 
 ```python
 learning_rate = 0.01
@@ -93,11 +93,35 @@ validation_steps = 50
 workers = 8
 ```
 
-Using these parameters and for a relatively small-to-medium sized neurla network, the training took around 3 hours.
+Using these parameters and for a relatively small-to-medium sized neurla network, the training took around 3 hours!!!
 
 ## Scoring ##
 
 The final_IoU score is: 0.41626866634390686 while final_score is 0.2825924314405811
+
+Full run can be found here: [model_training_cpu](./model_training_cpu.html)
+
+### Training my Model (GPU) ###
+
+Initially I started with a smaller network structure and only 5 epochs to verify my code then I double the number of filters for each layers and doubled the number of epochs. Current parameters are listed as follows:
+
+**Used Parameters**
+
+```python
+learning_rate = 0.01
+batch_size = 64
+num_epochs = 10
+steps_per_epoch = 64
+validation_steps = 50
+workers = 8
+```
+
+For the same set of parameters the training took less than 1 minute to complete.
+
+# Scoring #
+
+The final_IoU score is: 0.48423010090053176 while final_score is 0.32172734943778075
+Full run can be found here: [model_training_gpu](./model_training_gpu.html)
 
 **Ideas for Improving your Score**
 
