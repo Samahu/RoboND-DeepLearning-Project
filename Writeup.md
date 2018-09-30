@@ -1,5 +1,5 @@
 
-## Follow Me Project ##
+# Follow Me Project #
 
 In this project, I have trained a deep neural network to identify and track a target in simulation.
 
@@ -13,15 +13,15 @@ I did download and use the QuadSim to generate and record new training data, how
 
 **Installing Dependencies**
 
-In this part I many issues during the install. I did clone the reposity [RoboND-Python-Starterkit](https://github.com/udacity/RoboND-Python-StarterKit), however, when I follow the instructions and create the RoboND environment I get a "parse error". This seem to be rather a new issue since no has reported it yet to the issues tracker. I did face this issue when running within a windows 10 VM and also within a completely new Windows 10 installation. I report the issue to the  https://github.com/udacity/RoboND-Python-StarterKit/issues/5.
+In this part  I did clone the reposity [RoboND-Python-Starterkit](https://github.com/udacity/RoboND-Python-StarterKit), however, when I follow the instructions and create the RoboND environment I get a "parse error". This seem to be rather a new issue since no has reported it yet to the issues tracker. I did face this issue when running within a windows 10 VM and also within a completely new Windows 10 installation. I report the issue to the  https://github.com/udacity/RoboND-Python-StarterKit/issues/5.
 
-I had two successful workarounds, one is to copy the environment from an older working installation. The other one (after many trials and error) is detailed in my comment in the same issues thread: https://github.com/udacity/RoboND-Python-StarterKit/issues/5#issuecomment-425746056
+After many trials and error I had a good workaround which is detailed in my comment in the same issues thread: https://github.com/udacity/RoboND-Python-StarterKit/issues/5#issuecomment-425746056
 
-## Implementing the Segmentation Network
+## Implementing the Segmentation Network ##
 
 I did implement the required methods for the encoder and decoder blocks.
 
-# Encoder Block
+**Encoder Block**
 
 ```python
 def encoder_block(input_layer, filters, strides):
@@ -32,7 +32,7 @@ def encoder_block(input_layer, filters, strides):
     return output_layer
 ```
 
-# Decoder Block
+**Decoder Block**
 
 ```python
 def decoder_block(small_ip_layer, large_ip_layer, filters):
@@ -49,7 +49,7 @@ def decoder_block(small_ip_layer, large_ip_layer, filters):
     return output_layer
 ```
 
-# Network Structure
+**Network Structure**  
 The chosen network structure is detailed as follows:
 
 ```python
@@ -71,18 +71,18 @@ def fcn_model(inputs, num_classes):
     return layers.Conv2D(num_classes, 1, activation='softmax', padding='same')(x)
 ```
 
-<<< Explaining Layers: >>>
+<<< TODO: Explaining Layers: >>>
 
 
 ## Training, Predicting and Scoring ##
 
 These results are based on runnin the model on my local PC using merely the CPU which has 8 logical processors.
 
-### Training my Model (CPU) ###
+**Training my Model (CPU)**
 
 Initially I started with a smaller network structure and only 5 epochs to verify my code then I double the number of filters for each layers and doubled the number of epochs. Current parameters are listed as follows:
 
-**Used Parameters**
+*Used Parameters*
 
 ```python
 learning_rate = 0.01
@@ -95,17 +95,17 @@ workers = 8
 
 Using these parameters and for a relatively small-to-medium sized neurla network, the training took around 3 hours!!!
 
-## Scoring ##
+*Scoring*
 
 The final_IoU score is: 0.41626866634390686 while final_score is 0.2825924314405811
 
 Full run can be found here: [model_training_cpu](./model_training_cpu.html)
 
-### Training my Model (GPU) ###
+**Training my Model (GPU)**
 
-Initially I started with a smaller network structure and only 5 epochs to verify my code then I double the number of filters for each layers and doubled the number of epochs. Current parameters are listed as follows:
+Training on the CPU was very slow so I switched to spent some time to enable tensorflow to run on my local GPU.
 
-**Used Parameters**
+*Used Parameters*
 
 ```python
 learning_rate = 0.01
@@ -118,9 +118,10 @@ workers = 8
 
 For the same set of parameters the training took less than 1 minute to complete.
 
-# Scoring #
+*Scoring*
 
-The final_IoU score is: 0.48423010090053176 while final_score is 0.32172734943778075
+The final_IoU score is: 0.48423010090053176 while final_score is 0.32172734943778075 which is considerably better than the score previous score.
+
 Full run can be found here: [model_training_gpu](./model_training_gpu.html)
 
 **Ideas for Improving your Score**
