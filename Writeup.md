@@ -24,7 +24,7 @@ I did download and use the QuadSim to generate and record new training data, how
 
 **Install Dependencies**
 
-In this part I many issues during the install. I did clone the reposity [RoboND-Python-Starterkit](https://github.com/udacity/RoboND-Python-StarterKit), however, when I follow the instructions and create the RoboND environment I get a "parse error". This seem to be rather a new issue since no has reported it yet to the issues tracker. I did face this issue when running within a windows 10 VM and also within a completely new Windows 10 installation. I report the issue to the  https://github.com/udacity/RoboND-Python-StarterKit/issues.
+In this part I many issues during the install. I did clone the reposity [RoboND-Python-Starterkit](https://github.com/udacity/RoboND-Python-StarterKit), however, when I follow the instructions and create the RoboND environment I get a "parse error". This seem to be rather a new issue since no has reported it yet to the issues tracker. I did face this issue when running within a windows 10 VM and also within a completely new Windows 10 installation. I report the issue to the  https://github.com/udacity/RoboND-Python-StarterKit/issues/5.
 
 I had two successful workarounds, one is to copy the environment from an older working installation. The other one (after many trials and error) is to run "conda env list" 
 
@@ -32,61 +32,57 @@ I had two successful workarounds, one is to copy the environment from an older w
 
 I did implement the required methods for the encoder and decoder blocks.
 
-The chosen network architecture is detailed as follows:
+# Encoder Block
 
-
-
-## Collecting Training Data ##
-A simple training dataset has been provided in this project's repository. This dataset will allow you to verify that your segmentation network is semi-functional. However, if your interested in improving your score,you may want to collect additional training data. To do it, please see the following steps.
-
-The data directory is organized as follows:
-```
-data/runs - contains the results of prediction runs
-data/train/images - contains images for the training set
-data/train/masks - contains masked (labeled) images for the training set
-data/validation/images - contains images for the validation set
-data/validation/masks - contains masked (labeled) images for the validation set
-data/weights - contains trained TensorFlow models
-
-data/raw_sim_data/train/run1
-data/raw_sim_data/validation/run1
+```python
+def encoder_block(input_layer, filters, strides):
+    
+    # DONE Create a separable convolution layer using the separable_conv2d_batchnorm() function.
+    output_layer = separable_conv2d_batchnorm(input_layer, filters, strides)
+    
+    return output_layer
 ```
 
-### Training Set ###
-1. Run QuadSim
-2. Click the `DL Training` button
-3. Set patrol points, path points, and spawn points. **TODO** add link to data collection doc
-3. With the simulator running, press "r" to begin recording.
-4. In the file selection menu navigate to the `data/raw_sim_data/train/run1` directory
-5. **optional** to speed up data collection, press "9" (1-9 will slow down collection speed)
-6. When you have finished collecting data, hit "r" to stop recording.
-7. To reset the simulator, hit "`<esc>`"
-8. To collect multiple runs create directories `data/raw_sim_data/train/run2`, `data/raw_sim_data/train/run3` and repeat the above steps.
+# Decoder Block
 
-
-### Validation Set ###
-To collect the validation set, repeat both sets of steps above, except using the directory `data/raw_sim_data/validation` instead rather than `data/raw_sim_data/train`.
-
-### Image Preprocessing ###
-Before the network is trained, the images first need to be undergo a preprocessing step. The preprocessing step transforms the depth masks from the sim, into binary masks suitable for training a neural network. It also converts the images from .png to .jpeg to create a reduced sized dataset, suitable for uploading to AWS. 
-To run preprocessing:
+```python
+def decoder_block(small_ip_layer, large_ip_layer, filters):
+    
+    # DONE Upsample the small input layer using the bilinear_upsample() function.    
+    upsampled_layer = bilinear_upsample(small_ip_layer)
+    
+    # DONE Concatenate the upsampled and large input layers using layers.concatenate
+    concatenated_layer = layers.concatenate([upsampled_layer, large_ip_layer], axis=-1)
+    
+    # DONE Add some number of separable convolution layers
+    output_layer = separable_conv2d_batchnorm(concatenated_layer, filters)
+    
+    return output_layer
 ```
-$ python preprocess_ims.py
+
+# Network Structure
+The chosen network structure is detailed as follows:
+
+```python
+def fcn_model(inputs, num_classes):
+
+    # DONE Add Encoder Blocks. 
+    # Remember that with each encoder layer, the depth of your model (the number of filters) increases.
+    l1 = encoder_block(inputs, 16, 2)
+    l2 = encoder_block(l1, 32, 2)
+
+    # DONE Add 1x1 Convolution layer using conv2d_batchnorm().
+    l3 = conv2d_batchnorm(l2, 64, kernel_size=1, strides=1)
+    
+    # DONE: Add the same number of Decoder Blocks as the number of Encoder Blocks
+    l4 = decoder_block(l3, l1, 32)
+    x = l5 = decoder_block(l4, inputs, 16)
+    
+    # The function returns the output layer of your model. "x" is the final layer obtained from the last decoder_block()
+    return layers.Conv2D(num_classes, 1, activation='softmax', padding='same')(x)
 ```
-**Note**: If your data is stored as suggested in the steps above, this script should run without error.
 
-**Important Note 1:** 
-
-Running `preprocess_ims.py` does *not* delete files in the processed_data folder. This means if you leave images in processed data and collect a new dataset, some of the data in processed_data will be overwritten some will be left as is. It is recommended to **delete** the train and validation folders inside processed_data(or the entire folder) before running `preprocess_ims.py` with a new set of collected data.
-
-**Important Note 2:**
-
-The notebook, and supporting code assume your data for training/validation is in data/train, and data/validation. After you run `preprocess_ims.py` you will have new `train`, and possibly `validation` folders in the `processed_ims`.
-Rename or move `data/train`, and `data/validation`, then move `data/processed_ims/train`, into `data/`, and  `data/processed_ims/validation`also into `data/`
-
-**Important Note 3:**
-
-Merging multiple `train` or `validation` may be difficult, it is recommended that data choices be determined by what you include in `raw_sim_data/train/run1` with possibly many different runs in the directory. You can create a temporary folder in `data/` and store raw run data you don't currently want to use, but that may be useful for later. Choose which `run_x` folders to include in `raw_sim_data/train`, and `raw_sim_data/validation`, then run  `preprocess_ims.py` from within the 'code/' directory to generate your new training and validation sets. 
+<<< Explaining Layers: >>>
 
 
 ## Training, Predicting and Scoring ##
