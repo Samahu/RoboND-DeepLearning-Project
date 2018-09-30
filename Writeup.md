@@ -124,7 +124,75 @@ The final_IoU score is: 0.48423010090053176 while final_score is 0.3217273494377
 
 Full run can be found here: [model_training_gpu](./model_training_gpu.html)
 
+**Tuning the model**
+The model was doing farely well and since testing new parameters wasn't a big deal I started to experment with different sort of parameters:
+
+1- increase the depth of the network:
+
+```python
+def fcn_model(inputs, num_classes):
+
+    # DONE Add Encoder Blocks. 
+    # Remember that with each encoder layer, the depth of your model (the number of filters) increases.
+    l1 = encoder_block(inputs, 16, 2)
+    l2 = encoder_block(l1, 32, 2)
+    l3 = encoder_block(l2, 64, 2)
+    
+    # DONE Add 1x1 Convolution layer using conv2d_batchnorm().
+    l4 = conv2d_batchnorm(l3, 128, kernel_size=1, strides=1)
+    
+    # DONE: Add the same number of Decoder Blocks as the number of Encoder Blocks
+    l5 = decoder_block(l4, l2, 64)
+    l6 = decoder_block(l5, l1, 32)
+    l7 = decoder_block(l6, inputs, 16)  
+    
+    # The function returns the output layer of your model. "x" is the final layer obtained from the last decoder_block()
+    return layers.Conv2D(num_classes, 1, activation='softmax', padding='same')(l7)
+```
+
+[model_training_gpu_deeper](./model_training_gpu_deeper.html)
+
+The final_IoU score is: 0.5009583480596416 and final_score is 0.3329120027316983
+
+2- Increase epoch to 16 and steps per epoch to 128
+```python
+learning_rate = 0.01
+batch_size = 64
+num_epochs = 16
+steps_per_epoch = 128
+validation_steps = 50
+workers = 8
+```
+
+[model_training_deeper_16_epochs_steps_128](./model_training_deeper_16_epochs_steps_128.html)
+
+The final_IoU score is: 0.5328716191810497 and final_score is 0.39073219749257454 which is slightly below the score to pass the project.
+
+3- Reduce learning rate (Not helpful, Reverted)
+```python
+learning_rate = 0.001
+batch_size = 64
+num_epochs = 32
+steps_per_epoch = 128
+validation_steps = 50
+workers = 8
+
+4- Increase num epochs to 20
+```
+ ```python
+learning_rate = 0.01
+batch_size = 64
+num_epochs = 20
+steps_per_epoch = 128
+validation_steps = 50
+workers = 8
+```
+The final_IoU score is: **0.5677908791302491** and final_score is **0.4104730240846068** where both values are above the passing score according to the ruberic.
+
+[model_training_gpu_deeper_20_epochs_steps_128](./model_training_gpu_deeper_20_epochs_steps_128.html)
+
 **Ideas for Improving your Score**
 
 - Collect more data that contain the hero.
-- Switch to using *tensorflow-gpu* to allow me increase network size and increase epochs and steps_per_epochs to get better results.
+- Add more samples for the hero while it is distant
+- Do hyper parameter search using either grid search or more advanced method for parameter optimizations
