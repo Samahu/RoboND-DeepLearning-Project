@@ -1,5 +1,6 @@
-
 # Follow Me Project #
+
+[image_0]: ./network-structure.jpg
 
 In this project, I have trained a deep neural network to identify and track a target in simulation.
 
@@ -71,7 +72,15 @@ def fcn_model(inputs, num_classes):
     return layers.Conv2D(num_classes, 1, activation='softmax', padding='same')(x)
 ```
 
-<<< TODO: Explaining Layers: >>>
+The following image better illustrates the network structure:
+
+![alt text][image_0]
+
+Each of the two encoders is based of a Separable Convolution that would result in a reduced width and height of the input image consecutively but with an increased depth. The reduced width and height comes from having a stride size of 2. The number of filters specifies the new depth which double with every filter. The output of the second encoder is then passed to a 1x1 convolution to sum up the depthwise separable convolution step. The benefit of the separable convolution over fully connected convolution is a reduced number of parameters which allows a smaller network that has a similar performance as a fully connected one and can be trained faster.
+
+The decoders decode the immediate previous layer (higher widthxdepth but lower depth) using a bilinear upsample operation. The output of the bilinear sampel is combined with an earlier layer and then passed to a Separable Convolution with reduced number of fitlers.
+
+All layers have batch normalizations in between. These helps to train faster and also has a regularization effect.
 
 
 ## Training, Predicting and Scoring ##
