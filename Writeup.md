@@ -134,9 +134,12 @@ The final_IoU score is: 0.48423010090053176 while final_score is 0.3217273494377
 Full run can be found here: [model_training_gpu](./model_training_gpu.html)
 
 **Tuning the model**
-The model was doing farely well and since testing new parameters wasn't a big deal I started to experment with different sort of parameters:
 
-1- increase the depth of the network:
+The model was doing performing fare but below expectation. Enabling GPU was a big help since testing new parameters wasn't a big deal thus I started testing different parameters that might boost performance:
+
+1- Increase the depth of the network:
+
+I have done this by adding another encoder/decoder pair. This increases the capacity of the network to capture more detail but have the potential to underfit of overfit without having enough train samples or not enough training cycles. the validation set helps check if we overfitting.
 
 ```python
 def fcn_model(inputs, num_classes):
@@ -159,11 +162,14 @@ def fcn_model(inputs, num_classes):
     return layers.Conv2D(num_classes, 1, activation='softmax', padding='same')(l7)
 ```
 
+Results:
+
 [model_training_gpu_deeper](./model_training_gpu_deeper.html)
 
 The final_IoU score is: 0.5009583480596416 and final_score is 0.3329120027316983
 
 2- Increase epoch to 16 and steps per epoch to 128
+
 ```python
 learning_rate = 0.01
 batch_size = 64
@@ -173,11 +179,14 @@ validation_steps = 50
 workers = 8
 ```
 
+Results:
+
 [model_training_deeper_16_epochs_steps_128](./model_training_deeper_16_epochs_steps_128.html)
 
 The final_IoU score is: 0.5328716191810497 and final_score is 0.39073219749257454 which is slightly below the score to pass the project.
 
 3- Reduce learning rate (Not helpful, Reverted)
+
 ```python
 learning_rate = 0.001
 batch_size = 64
@@ -196,6 +205,8 @@ steps_per_epoch = 128
 validation_steps = 50
 workers = 8
 ```
+Results:
+
 The final_IoU score is: **0.5677908791302491** and final_score is **0.4104730240846068** where both values are above the passing score according to the ruberic.
 
 [model_training_gpu_deeper_20_epochs_steps_128](./model_training_gpu_deeper_20_epochs_steps_128.html)
