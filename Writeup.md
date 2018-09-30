@@ -93,6 +93,8 @@ validation_steps = 50
 workers = 8
 ```
 
+Using these parameters and for a relatively small-to-medium sized neurla network, the training took around 3 hours.
+
 ## Scoring ##
 
 The final_IoU score is: 0.41626866634390686 while final_score is 0.2825924314405811
@@ -100,4 +102,4 @@ The final_IoU score is: 0.41626866634390686 while final_score is 0.2825924314405
 **Ideas for Improving your Score**
 
 - Collect more data that contain the hero.
-- Using GPU to allow me increase network size and increase epochs and steps_per_epochs to get better results.
+- Switch to using *tensorflow-gpu* to allow me increase network size and increase epochs and steps_per_epochs to get better results.
