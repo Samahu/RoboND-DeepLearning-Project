@@ -194,9 +194,10 @@ num_epochs = 32
 steps_per_epoch = 128
 validation_steps = 50
 workers = 8
+```
 
 4- Increase num epochs to 20
-```
+
  ```python
 learning_rate = 0.01
 batch_size = 64
