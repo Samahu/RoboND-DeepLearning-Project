@@ -1,34 +1,23 @@
-[![Udacity - Robotics NanoDegree Program](https://s3-us-west-1.amazonaws.com/udacity-robotics/Extra+Images/RoboND_flag.png)](https://www.udacity.com/robotics)
 
-## Deep Learning Project ##
+## Follow Me Project ##
 
-In this project, you will train a deep neural network to identify and track a target in simulation. So-called “follow me” applications like this are key to many fields of robotics and the very same techniques you apply here could be extended to scenarios like advanced cruise control in autonomous vehicles or human-robot collaboration in industry.
+In this project, I have trained a deep neural network to identify and track a target in simulation.
 
-[image_0]: ./docs/misc/sim_screenshot.png
-![alt text][image_0] 
-
-## Setup Instructions
-**Clone the repository**
-
-```
-$ git clone https://github.com/udacity/RoboND-DeepLearning.git
-```
-
-**Download the data**
+**Downloading the data**
 
 I have downloaded the training and validation data locally and extracted them into the data folder.
 
-**Download the QuadSim binary**
+**Downloaded the QuadSim binary**
 
 I did download and use the QuadSim to generate and record new training data, however, for this submission I relied mainly on the provided datasets.
 
-**Install Dependencies**
+**Installing Dependencies**
 
 In this part I many issues during the install. I did clone the reposity [RoboND-Python-Starterkit](https://github.com/udacity/RoboND-Python-StarterKit), however, when I follow the instructions and create the RoboND environment I get a "parse error". This seem to be rather a new issue since no has reported it yet to the issues tracker. I did face this issue when running within a windows 10 VM and also within a completely new Windows 10 installation. I report the issue to the  https://github.com/udacity/RoboND-Python-StarterKit/issues/5.
 
 I had two successful workarounds, one is to copy the environment from an older working installation. The other one (after many trials and error) is to run "conda env list" 
 
-## Implement the Segmentation Network
+## Implementing the Segmentation Network
 
 I did implement the required methods for the encoder and decoder blocks.
 
@@ -86,54 +75,29 @@ def fcn_model(inputs, num_classes):
 
 
 ## Training, Predicting and Scoring ##
-With your training and validation data having been generated or downloaded from the above section of this repository, you are free to begin working with the neural net.
 
-**Note**: Training CNNs is a very compute-intensive process. If your system does not have a recent Nvidia graphics card, with [cuDNN](https://developer.nvidia.com/cudnn) and [CUDA](https://developer.nvidia.com/cuda) installed , you may need to perform the training step in the cloud. Instructions for using AWS to train your network in the cloud may be found [here](https://classroom.udacity.com/nanodegrees/nd209/parts/09664d24-bdec-4e64-897a-d0f55e177f09/modules/cac27683-d5f4-40b4-82ce-d708de8f5373/lessons/197a058e-44f6-47df-8229-0ce633e0a2d0/concepts/27c73209-5d7b-4284-8315-c0e07a7cd87f?contentVersion=1.0.0&contentLocale=en-us)
+These results are based on runnin the model on my local PC using merely the CPU which has 8 logical processors.
 
-### Training your Model ###
-**Prerequisites**
-- Training data is in `data` directory
-- Validation data is in the `data` directory
-- The folders `data/train/images/`, `data/train/masks/`, `data/validation/images/`, and `data/validation/masks/` should exist and contain the appropriate data
+### Training my Model ###
 
-To train complete the network definition in the `model_training.ipynb` notebook and then run the training cell with appropriate hyperparameters selected.
+Initially I started with a smaller network structure and only 5 epochs to verify my code then I double the number of filters for each layers and doubled the number of epochs. Current parameters are listed as follows:
 
-After the training run has completed, your model will be stored in the `data/weights` directory as an [HDF5](https://en.wikipedia.org/wiki/Hierarchical_Data_Format) file, and a configuration_weights file. As long as they are both in the same location, things should work. 
+# Used Parameters:
 
-**Important Note** the *validation* directory is used to store data that will be used during training to produce the plots of the loss, and help determine when the network is overfitting your data. 
-
-The **sample_evalution_data** directory contains data specifically designed to test the networks performance on the FollowME task. In sample_evaluation data are three directories each generated using a different sampling method. The structure of these directories is exactly the same as `validation`, and `train` datasets provided to you. For instance `patrol_with_targ` contains an `images` and `masks` subdirectory. If you would like to the evaluation code on your `validation` data a copy of the it should be moved into `sample_evaluation_data`, and then the appropriate arguments changed to the function calls in the `model_training.ipynb` notebook.
-
-The notebook has examples of how to evaulate your model once you finish training. Think about the sourcing methods, and how the information provided in the evaluation sections relates to the final score. Then try things out that seem like they may work. 
+```python
+learning_rate = 0.01
+batch_size = 64
+num_epochs = 10
+steps_per_epoch = 64
+validation_steps = 50
+workers = 8
+```
 
 ## Scoring ##
 
-To score the network on the Follow Me task, two types of error are measured. First the intersection over the union for the pixelwise classifications is computed for the target channel. 
-
-In addition to this we determine whether the network detected the target person or not. If more then 3 pixels have probability greater then 0.5 of being the target person then this counts as the network guessing the target is in the image. 
-
-We determine whether the target is actually in the image by whether there are more then 3 pixels containing the target in the label mask. 
-
-Using the above the number of detection true_positives, false positives, false negatives are counted. 
-
-**How the Final score is Calculated**
-
-The final score is the pixelwise `average_IoU*(n_true_positive/(n_true_positive+n_false_positive+n_false_negative))` on data similar to that provided in sample_evaulation_data
+The final_IoU score is: 0.41626866634390686 while final_score is 0.2825924314405811
 
 **Ideas for Improving your Score**
 
-Collect more data from the sim. Look at the predictions think about what the network is getting wrong, then collect data to counteract this. Or improve your network architecture and hyperparameters. 
-
-**Obtaining a Leaderboard Score**
-
-Share your scores in slack, and keep a tally in a pinned message. Scores should be computed on the sample_evaluation_data. This is for fun, your grade will be determined on unreleased data. If you use the sample_evaluation_data to train the network, it will result in inflated scores, and you will not be able to determine how your network will actually perform when evaluated to determine your grade.
-
-## Experimentation: Testing in Simulation
-1. Copy your saved model to the weights directory `data/weights`.
-2. Launch the simulator, select "Spawn People", and then click the "Follow Me" button.
-3. Run the realtime follower script
-```
-$ python follower.py my_amazing_model.h5
-```
-
-**Note:** If you'd like to see an overlay of the detected region on each camera frame from the drone, simply pass the `--pred_viz` parameter to `follower.py`
+- Collect more data that contain the hero.
+- Using GPU to allow me increase network size and increase epochs and steps_per_epochs to get better results.
