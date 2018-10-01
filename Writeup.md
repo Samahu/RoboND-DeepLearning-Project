@@ -218,3 +218,7 @@ The final_IoU score is: **0.5677908791302491** and final_score is **0.4104730240
 - Collect more data that contain the hero.
 - Add more samples for the hero while it is distant
 - Do hyper parameter search using either grid search or more advanced method for parameter optimizations
+
+
+**Would this model work for following another object other than human like (dog, cat, car, ...)?**
+- The answer is yes, however, a different training and validation sets are required. These sets should contain images from different angels of the object that we are trying to follow.
