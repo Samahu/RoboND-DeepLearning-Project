@@ -76,12 +76,13 @@ The following image better illustrates the network structure:
 
 ![alt text][image_0]
 
-Each of the two encoders is based of a Separable Convolution that would result in a reduced width and height of the input image consecutively but with an increased depth. The reduced width and height comes from having a stride size of 2. The number of filters specifies the new depth which double with every filter. The output of the second encoder is then passed to a 1x1 convolution to sum up the depthwise separable convolution step. The benefit of the separable convolution over fully connected convolution is a reduced number of parameters which allows a smaller network that has a similar performance as a fully connected one and can be trained faster.
+* Each of the two encoders is based of a Separable Convolution that would result in a reduced width and height of the input image consecutively but with an increased depth. The reduced width and height comes from having a stride size of 2. The number of filters specifies the new depth which double with every filter. The output of the second encoder is then passed to a 1x1 convolution to sum up the depthwise separable convolution step. The benefit of the separable convolution over fully connected convolution is a reduced number of parameters which allows a smaller network that has a similar performance as a fully connected one and can be trained faster.
 
-The decoders decode the immediate previous layer (higher widthxdepth but lower depth) using a bilinear upsample operation. The output of the bilinear sampel is combined with an earlier layer and then passed to a Separable Convolution with reduced number of fitlers.
+* The decoders decode the immediate previous layer (higher widthxdepth but lower depth) using a bilinear upsample operation. The output of the bilinear sampel is combined with an earlier layer and then passed to a Separable Convolution with reduced number of fitlers.
 
-All layers have batch normalizations in between. These helps to train faster and also has a regularization effect.
+* All layers have batch normalizations in between. These helps to train faster and also has a regularization effect.
 
+* 1x1 Convolutions allows us to manipulate the depth of nueral network, either increase, decrease or even keep the same depth. The operation is typically followed by ReLU activation. In addition to manipulating the depth, a 1x1 convolution adds non-linearity to the network allowing it to learn more complex functions.
 
 ## Training, Predicting and Scoring ##
 
