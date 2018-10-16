@@ -76,12 +76,15 @@ The following image better illustrates the network structure:
 
 ![alt text][image_0]
 
-Each of the two encoders is based of a Separable Convolution that would result in a reduced width and height of the input image consecutively but with an increased depth. The reduced width and height comes from having a stride size of 2. The number of filters specifies the new depth which double with every filter. The output of the second encoder is then passed to a 1x1 convolution to sum up the depthwise separable convolution step. The benefit of the separable convolution over fully connected convolution is a reduced number of parameters which allows a smaller network that has a similar performance as a fully connected one and can be trained faster.
+* Each of the two encoders is based of a Separable Convolution that would result in a reduced width and height of the input image consecutively but with an increased depth. The reduced width and height comes from having a stride size of 2. The number of filters specifies the new depth which double with every filter. The output of the second encoder is then passed to a 1x1 convolution to sum up the depthwise separable convolution step. The benefit of the separable convolution over fully connected convolution is a reduced number of parameters which allows a smaller network that has a similar performance as a fully connected one and can be trained faster.
 
-The decoders decode the immediate previous layer (higher widthxdepth but lower depth) using a bilinear upsample operation. The output of the bilinear sampel is combined with an earlier layer and then passed to a Separable Convolution with reduced number of fitlers.
+* The decoders decode the immediate previous layer (higher widthxdepth but lower depth) using a bilinear upsample operation. The output of the bilinear sampel is combined with an earlier layer and then passed to a Separable Convolution with reduced number of fitlers.
 
-All layers have batch normalizations in between. These helps to train faster and also has a regularization effect.
+* All layers have batch normalizations in between. These helps to train faster and also has a regularization effect.
 
+* 1x1 Convolutions allows us to manipulate the depth of nueral network, either increase, decrease or even keep the same depth. The operation is typically followed by ReLU activation. In addition to manipulating the depth, a 1x1 convolution adds non-linearity to the network allowing it to learn more complex functions.
+
+* We apply encoder/decoder architecutre to help identify the different classes of objects in the image on a pixel level in contrast to using boxes that outline the target object. The encoder creates a compressed form of input image while the decoder uses this compressd form to reconstruct an image that is very similar to the original input image. During this process the model can lose many of the finer details about input images. To help retain these these details we employ skip connections as illustrated in the network architecutre above. Skip connections allow information from earlier layers to flow to later layers thus helping the network preserve some of important details of the input image.
 
 ## Training, Predicting and Scoring ##
 
@@ -112,7 +115,7 @@ Full run can be found here: [model_training_cpu](./model_training_cpu.html)
 
 **Training my Model (GPU)**
 
-Training on the CPU was very slow so I switched to spent some time to enable tensorflow to run on my local GPU.
+Training on the CPU was very slow so I spent some time to enable tensorflow to run on my local GPU.
 
 *Used Parameters*
 
@@ -137,7 +140,7 @@ Full run can be found here: [model_training_gpu](./model_training_gpu.html)
 
 The model was doing performing fare but below expectation. Enabling GPU was a big help since testing new parameters wasn't a big deal thus I started testing different parameters that might boost performance:
 
-1- Increase the depth of the network:
+1- Adding another pair of encoder/decoder layers:
 
 I have done this by adding another encoder/decoder pair. This increases the capacity of the network to capture more detail but have the potential to underfit of overfit without having enough train samples or not enough training cycles. the validation set helps check if we overfitting.
 
@@ -217,3 +220,7 @@ The final_IoU score is: **0.5677908791302491** and final_score is **0.4104730240
 - Collect more data that contain the hero.
 - Add more samples for the hero while it is distant
 - Do hyper parameter search using either grid search or more advanced method for parameter optimizations
+
+
+**Would this model work for following another object other than human like (dog, cat, car, ...)?**
+- The answer is yes, however, a different training and validation sets are required. These sets should contain images from different angels of the object that we are trying to follow.
